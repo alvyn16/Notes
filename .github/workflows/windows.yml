@@ -1,0 +1,53 @@
+name: Windows
+on:
+  push:
+    branches: [master, main]
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        shell: pwsh
+        run: rustup toolchain install stable --profile minimal --component clippy,rustfmt
+      - name: Check and package
+        shell: pwsh
+        run: |
+          if ('${{ github.ref_type }}' -eq 'tag') {
+            $version = (Select-String -LiteralPath Cargo.toml -Pattern '^version = "([^"]+)"' | Select-Object -First 1).Matches.Groups[1].Value
+            if ('${{ github.ref_name }}' -ne "v$version") { throw 'Release tag must match Cargo.toml version' }
+          }
+          ./scripts/build.ps1 -Check
+      - name: Verify installer and updater
+        shell: pwsh
+        run: ./scripts/test-distribution.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Notes-Windows
+          path: |
+            dist/Notes.exe
+            dist/Notes-Setup.exe
+            dist/Notes-Windows.zip
+            dist/SHA256SUMS.txt
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: Notes-Windows
+          path: dist
+      - name: Publish portable app and native setup
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release create "${{ github.ref_name }}" dist/Notes.exe dist/Notes-Setup.exe dist/Notes-Windows.zip dist/SHA256SUMS.txt --title "Notes ${{ github.ref_name }}" --notes "Native Windows Markdown app. Use Notes-Setup.exe for per-user installation, or Notes-Windows.zip for a portable copy. These artifacts are unsigned. Checksums are included."

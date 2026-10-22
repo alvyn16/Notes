@@ -1,0 +1,2 @@
+# Preserve the bundled third-party notices, including original whitespace.
+licenses/* -whitespace
