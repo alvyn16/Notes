@@ -6,6 +6,22 @@ screenshots supplied for this project. No original app source was cloned,
 installed, copied, or embedded. No Tauri, React, WebView, Node, or browser runtime
 is required to run this app.
 
+## Screenshots
+
+Actual captures of the native Windows app running with sample notes.
+
+![Notes workspace with sidebar and a daily note](docs/screenshots/workspace.png)
+
+| Settings | Welcome screen |
+| --- | --- |
+| ![Theme and appearance settings](docs/screenshots/settings.png) | ![Welcome screen with create note and open workspace actions](docs/screenshots/welcome.png) |
+
+| Command search · Ctrl+P | Mermaid viewer |
+| --- | --- |
+| ![Command palette with recent notes and workspace commands](docs/screenshots/palette.png) | ![Native Mermaid diagram viewer](docs/screenshots/diagram-viewer.png) |
+
+Click any screenshot to view it at full size.
+
 ## Run
 
 Build the project, then use `dist/Notes-Setup.exe` for a per-user installation,
